@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Athar Garment Studio - Hisab Kitab Pro</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Cinzel:wght@500;700&family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+</head>
+<body class="theme-dark">
+
+    <!-- Top Live Bar -->
+    <header class="top-bar glass-box">
+        <div class="user-info">
+            <span id="display-name" class="editable-text">A-T-H-A-R</span>
+            <div id="live-clock" class="digital-clock">00:00:00 AM</div>
+        </div>
+        <div class="top-actions">
+            <button class="icon-btn" onclick="openReportModal()" title="सेठ को रिपोर्ट दिखाएं">📊</button>
+            <button class="icon-btn" onclick="toggleEditMode()" title="Edit Boxes">⚙️</button>
+        </div>
+    </header>
+
+    <!-- Zero-Scroll Quick Piece Entry Bar (बिना स्क्रॉल किए तुरंत एंट्री) -->
+    <section class="quick-entry-card glass-box">
+        <h3>⚡ तुरंत पीस एंट्री</h3>
+        <div class="entry-row">
+            <select id="quick-garment-select" onchange="fillQuickRate()">
+                <option value="">कपड़ा चुनें...</option>
+            </select>
+            <input type="number" id="quick-qty" placeholder="पीसीएस" min="1" value="1">
+            <input type="number" id="quick-rate" placeholder="रेट (₹)">
+        </div>
+        <div class="entry-row-2">
+            <input type="file" id="quick-photo" accept="image/*" style="display:none;" onchange="previewQuickPhoto(event)">
+            <button class="btn-secondary" onclick="document.getElementById('quick-photo').click()">📷 फोटो जोड़ें</button>
+            <span id="photo-status">कोई फोटो नहीं</span>
+            <button class="btn-primary" onclick="saveQuickPiece()">💾 Save Piece</button>
+        </div>
+    </section>
+
+    <!-- Main Navigation Tabs -->
+    <nav class="nav-tabs">
+        <button class="tab-btn active" onclick="switchTab('work')">📁 हिसाब</button>
+        <button class="tab-btn" onclick="switchTab('kharcha')">💸 खर्चा</button>
+        <button class="tab-btn" onclick="switchTab('rates')">📋 रेट लिस्ट</button>
+        <button class="tab-btn" onclick="switchTab('studio')">🎨 Studio</button>
+    </nav>
+
+    <!-- App Content Container (Swipeable Horizontal Views) -->
+    <main id="app-container" ontouchstart="handleTouchStart(event)" ontouchend="handleTouchEnd(event)">
+        
+        <!-- Tab 1: Work / Hisab -->
+        <div id="tab-work" class="tab-content active">
+            <div class="summary-cards">
+                <div class="card glass-box">
+                    <p>Total Pieces</p>
+                    <h2 id="total-pcs">0 Pcs</h2>
+                </div>
+                <div class="card glass-box">
+                    <p>Total Earnings</p>
+                    <h2 id="total-earn">₹ 0</h2>
+                </div>
+            </div>
+            <div id="pieces-list" class="grid-list"></div>
+        </div>
+
+        <!-- Tab 2: Kharcha -->
+        <div id="tab-kharcha" class="tab-content">
+            <div class="glass-box form-box">
+                <h3>साप्ताहिक खर्चा जोड़ें</h3>
+                <input type="text" id="kharcha-reason" placeholder="कारण (उदा. चाय, एडवांस)">
+                <input type="number" id="kharcha-amount" placeholder="रकम (₹)">
+                <button class="btn-primary" onclick="addKharcha()">खर्चा सेव करें</button>
+            </div>
+            <div id="kharcha-list" class="grid-list" style="margin-top: 15px;"></div>
+        </div>
+
+        <!-- Tab 3: Rates Master -->
+        <div id="tab-rates" class="tab-content">
+            <div class="glass-box form-box">
+                <h3>नया कपड़ा और रेट सेट करें</h3>
+                <input type="text" id="new-cloth-name" placeholder="कपड़े का नाम (उदा. Cotton Shirt)">
+                <input type="number" id="new-cloth-rate" placeholder="रेट प्रति पीस (₹)">
+                <button class="btn-primary" onclick="addNewRate()">रेट सेव करें</button>
+            </div>
+            <div id="rates-list" class="grid-list" style="margin-top: 15px;"></div>
+        </div>
+
+        <!-- Tab 4: 3D Studio & Customization -->
+        <div id="tab-studio" class="tab-content">
+            <div class="glass-box studio-box">
+                <h3>🎨 3D Liquid Glass & Color Studio</h3>
+                <label>यूज़र का नाम:</label>
+                <input type="text" id="input-username" value="A-T-H-A-R" oninput="updateUserName(this.value)">
+                
+                <label>ग्लास पारदर्शिता (Blur):</label>
+                <input type="range" id="glass-blur-range" min="5" max="50" value="16" oninput="updateGlassBlur(this.value)">
+
+                <label>3D Depth (किनारे का उभार):</label>
+                <input type="range" id="depth-range" min="1" max="25" value="10" oninput="update3DDepth(this.value)">
+
+                <label>मल्टी-कलर ग्रेडिएंट प्रीसेट्स:</label>
+                <div class="preset-colors">
+                    <button class="preset-btn" style="background:linear-gradient(135deg, #00c6ff, #0072ff)" onclick="setTheme('#00c6ff','#0072ff')"></button>
+                    <button class="preset-btn" style="background:linear-gradient(135deg, #f857a6, #ff5858)" onclick="setTheme('#f857a6','#ff5858')"></button>
+                    <button class="preset-btn" style="background:linear-gradient(135deg, #43e97b, #38f9d7)" onclick="setTheme('#43e97b','#38f9d7')"></button>
+                    <button class="preset-btn" style="background:linear-gradient(135deg, #fa709a, #fee140)" onclick="setTheme('#fa709a','#fee140')"></button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
