@@ -16,15 +16,18 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Build Web Assets
+      - name: Build Web Assets Safely
         run: |
-          echo "Building Athar Garment Studio static package..."
+          echo "Locating and bundling Athar Garment Studio files..."
           mkdir -p dist
-          cp index.html style.css script.js dist/
+          # Find and copy html, css, js wherever they are in root
+          find . -maxdepth 3 -name "*.html" -exec cp {} dist/ \;
+          find . -maxdepth 3 -name "*.css" -exec cp {} dist/ \;
+          find . -maxdepth 3 -name "*.js" -exec cp {} dist/ \;
+          ls -la dist/
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
-          
